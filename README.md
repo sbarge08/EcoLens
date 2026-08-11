@@ -4,34 +4,44 @@
 
 [![Open Live App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ecolens-decision.streamlit.app/)
 
-EcoLens transforms environmental conditions and resource constraints into practical, explainable intervention recommendations.
+EcoLens combines environmental conditions, available resources, and transparent decision logic to help identify practical interventions for a specific location.
+
+> **Understand your environment. Decide what to do next.**
 
 ---
 
-## Why EcoLens?
+## The Problem
 
-Environmental data can tell us what is happening, but it does not always tell us what action makes sense given the resources available.
+Environmental data is widely available, but data alone does not tell people what action makes sense.
 
-EcoLens addresses that gap by combining environmental data with a deterministic decision engine, budget constraints, scenario analysis, and an explainable AI layer.
+A location may have high temperatures, poor air quality, water-related risks, or strong solar potential, but the best intervention also depends on factors such as:
 
-The goal is simple:
+- Available budget
+- Expected environmental benefit
+- Implementation feasibility
+- Estimated cost
+- Potential savings
 
-> **Given the conditions and resources available, what should we consider doing next?**
+EcoLens connects these factors into a single decision-support workflow.
 
 ---
 
 ## What EcoLens Does
 
-A user selects a location, defines an available budget, and optionally considers solar.
+A user selects a location, provides an available budget, and optionally considers solar.
 
 EcoLens then:
 
-1. Retrieves environmental conditions and short-term forecast information.
-2. Evaluates potential environmental interventions.
+1. Retrieves environmental conditions and short-term forecast data.
+2. Evaluates potential interventions.
 3. Scores each intervention using multiple decision factors.
-4. Selects the strongest option for the current constraints.
-5. Allows the user to change the available budget and explore alternative scenarios.
-6. Explains the resulting decision using the evidence produced by the decision engine.
+4. Ranks the available options.
+5. Selects the strongest recommendation for the current resources.
+6. Allows the user to test different budget scenarios.
+7. Identifies resource thresholds where the recommendation changes.
+8. Generates an explanation of the decision.
+
+The goal is not simply to display environmental data, but to turn that data into an understandable decision.
 
 ---
 
@@ -39,15 +49,16 @@ EcoLens then:
 
 ### Environmental Assessment
 
-EcoLens provides a location-specific environmental profile including:
+EcoLens retrieves environmental information for the selected location, including:
 
 - Temperature
-- Air quality
 - Humidity
+- Air quality
+- PM2.5
 - Precipitation
 - Short-term temperature trends
 
-### Decision Engine
+### Multi-Factor Decision Engine
 
 Potential interventions are evaluated using:
 
@@ -55,66 +66,93 @@ Potential interventions are evaluated using:
 - Environmental impact
 - Affordability
 - Implementation feasibility
-- Available budget
-- Solar consideration
 
-The recommendation is produced by deterministic scoring rather than by the AI model.
+The recommendation is generated using deterministic scoring rather than an AI model.
 
 ### Budget-Aware Recommendations
 
-Available resources are part of the decision itself.
+Available resources directly affect which interventions are competitive.
 
-An intervention may have strong environmental potential but still rank lower if it does not fit the available budget or has lower implementation feasibility.
+For example, an intervention with a higher environmental benefit may not be recommended if its estimated cost exceeds the available budget.
 
-### Scenario Analysis
+### Solar Consideration
 
-The budget can be changed after an assessment to explore how the decision responds to different resource levels.
+EcoLens can incorporate solar potential when evaluating intervention options.
 
-EcoLens recalculates:
+Solar is treated as one factor in the decision rather than automatically becoming the recommendation.
 
-- Intervention rankings
-- Opportunity scores
-- Estimated costs
+### Intervention Ranking
+
+Instead of showing only one recommendation, EcoLens ranks multiple possible interventions so users can compare alternatives.
+
+Example interventions include:
+
+- HVAC Optimization
+- Energy Efficiency Upgrade
+- Heat Mitigation Upgrade
+- Solar Energy Installation
+- Water Conservation Upgrade
+
+### What-If Scenario Analysis
+
+Users can change the available budget and see how the decision responds.
+
+The scenario engine recalculates:
+
+- Recommendation
+- Opportunity score
+- Estimated cost
 - Estimated savings
-- Recommendation changes
+- Intervention ranking
 
 ### Decision Thresholds
 
-The scenario engine can identify approximately where additional resources cause the recommended intervention to change.
+EcoLens identifies approximately where additional resources cause the recommended intervention to change.
 
-This provides more information than a single recommendation because it shows how sensitive the decision is to the available budget.
+This helps answer questions such as:
+
+> "At what budget would a different intervention become the better option?"
 
 ### Explainable AI
 
-The AI layer interprets the evidence produced by the decision engine and converts it into a human-readable rationale.
+AI is used as an explanation layer rather than the underlying decision maker.
 
-It does not generate the underlying environmental measurements or financial estimates.
+The deterministic decision engine produces the recommendation first.
+
+The AI then interprets the evidence and explains:
+
+- Why the intervention was selected
+- What factors influenced the decision
+- What tradeoffs exist
+- What should be validated before implementation
+
+### Evidence Transparency
+
+EcoLens distinguishes between information that is measured or retrieved from environmental data and values that are model estimates.
+
+This helps prevent estimated financial or intervention outcomes from being mistaken for observed measurements.
+
+### Location Visualization
+
+The assessment includes a geographic visualization of the selected location.
 
 ---
 
-## Decision Engine
+# How the Decision Works
 
-EcoLens uses a deterministic scoring approach to compare potential interventions.
-
-The scoring process considers environmental opportunity, environmental impact, affordability, and implementation feasibility.
-
-The resulting scores are used to rank interventions and determine the recommendation for the current assessment.
-
-Keeping this logic deterministic makes the core recommendation reproducible and easier to inspect.
-
----
-
-## Scenario Analysis
-
-A key part of EcoLens is the ability to explore:
-
-> **What changes if the available resources change?**
-
-For example, a user can compare the decision at:
+EcoLens separates **measurement, decision-making, and explanation**.
 
 ```text
-$1,000
-$5,000
-$10,000
-$15,000
-$25,000
+Environmental Data
+       ↓
+Data Processing
+       ↓
+Decision Scoring
+       ↓
+Intervention Ranking
+       ↓
+Recommendation
+       ↓
+Scenario Analysis
+       ↓
+AI Explanation
