@@ -167,6 +167,9 @@ Rules:
 - Do not claim weather data guarantees financial outcomes.
 - Do not repeat the entire dashboard.
 - Keep the writing concise and professional.
+- Write monetary amounts normally, for example $3,000 and $5,000.
+- Do not put backticks around monetary amounts.
+- Do not use Markdown code formatting for numbers or currency.
 """
 
         response = client.chat.completions.create(

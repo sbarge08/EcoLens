@@ -120,17 +120,17 @@ The app includes a map of the selected location and an evidence section showing 
 
 ---
 
-## How It Works
+## Decision Logic
 
-```text
-Environmental Data
-        ↓
-Decision Scoring
-        ↓
-Intervention Ranking
-        ↓
-Recommendation
-        ↓
-Scenario Analysis
-        ↓
-AI Explanation
+Each intervention receives a score based on four main factors:
+
+- Environmental opportunity
+- Environmental impact
+- Affordability
+- Implementation feasibility
+
+The scores are combined using the weighting defined in `scoring.py`.
+
+The interventions are then ranked and the highest-scoring feasible option becomes the recommendation.
+
+The scenario engine repeats this process for different budget levels, allowing EcoLens to identify when the preferred intervention changes.
