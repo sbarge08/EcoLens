@@ -1,4 +1,5 @@
 import os
+import re
 import streamlit as st
 
 from openai import OpenAI
@@ -18,9 +19,7 @@ def get_api_key():
 
         if "FEATHERLESS_API_KEY" in st.secrets:
 
-            return st.secrets[
-                "FEATHERLESS_API_KEY"
-            ]
+            return st.secrets["FEATHERLESS_API_KEY"]
 
     except Exception:
 
@@ -30,9 +29,36 @@ def get_api_key():
     # Local environment variable
     # --------------------------------------------------------
 
-    return os.getenv(
-        "FEATHERLESS_API_KEY"
-    )
+    return os.getenv("FEATHERLESS_API_KEY")
+
+
+# ============================================================
+# CLEAN AI OUTPUT
+# ============================================================
+
+def clean_explanation(text):
+    """
+    Clean formatting returned by the AI before displaying it.
+
+    The AI sometimes adds Markdown code formatting around
+    currency values such as `5,000`. Those backticks cause
+    Streamlit to display the value as code.
+
+    This function removes that formatting while preserving
+    normal Markdown structure.
+    """
+
+    if not text:
+        return text
+
+    # Remove Markdown backticks.
+    text = text.replace("```", "")
+    text = text.replace("`", "")
+
+    # Remove accidental excessive whitespace.
+    text = re.sub(r"\n{3,}", "\n\n", text)
+
+    return text.strip()
 
 
 # ============================================================
@@ -57,9 +83,13 @@ def generate_explanation(
     """
     AI is used only as the explanation layer.
 
-    The deterministic decision engine selects
-    the intervention.
+    The deterministic decision engine selects the
+    intervention. The AI explains that decision.
     """
+
+    # --------------------------------------------------------
+    # FALLBACK
+    # --------------------------------------------------------
 
     fallback = (
         f"{recommendation} is the strongest fit for this "
@@ -76,7 +106,7 @@ def generate_explanation(
     api_key = get_api_key()
 
     # --------------------------------------------------------
-    # No API key
+    # NO API KEY
     # --------------------------------------------------------
 
     if not api_key:
@@ -91,6 +121,10 @@ def generate_explanation(
             timeout=20,
         )
 
+        # ----------------------------------------------------
+        # RANKING
+        # ----------------------------------------------------
+
         ranking_text = "\n".join(
             [
                 (
@@ -100,6 +134,10 @@ def generate_explanation(
                 for item in ranked_interventions
             ]
         )
+
+        # ----------------------------------------------------
+        # AI PROMPT
+        # ----------------------------------------------------
 
         prompt = f"""
 You are the explainability layer for EcoLens,
@@ -168,9 +206,15 @@ Rules:
 - Do not repeat the entire dashboard.
 - Keep the writing concise and professional.
 - Write monetary amounts normally, for example $3,000 and $5,000.
-- Do not put backticks around monetary amounts.
-- Do not use Markdown code formatting for numbers or currency.
+- Never put backticks around monetary amounts.
+- Never use Markdown code formatting for numbers or currency.
+- Use dollar signs for monetary values.
+- Do not put monetary values inside code blocks.
 """
+
+        # ----------------------------------------------------
+        # AI REQUEST
+        # ----------------------------------------------------
 
         response = client.chat.completions.create(
             model="Qwen/Qwen2.5-7B-Instruct",
@@ -184,13 +228,19 @@ Rules:
             temperature=0.15,
         )
 
-        return (
+        result = (
             response
             .choices[0]
             .message
             .content
             .strip()
         )
+
+        # ----------------------------------------------------
+        # FINAL FORMATTING CLEANUP
+        # ----------------------------------------------------
+
+        return clean_explanation(result)
 
     except Exception:
 
